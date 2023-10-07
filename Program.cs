@@ -1,146 +1,78 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NigrNegr
+namespace Bonus
 {
-    internal class Program
+    class Point
     {
-        static void Main(string[] args)
+        public double X { get; set; }
+        public double Y { get; set; }
+
+        public Point(double x, double y)
         {
-            Integer26();
-            Boolean38();
-            If13();
-            For12();
-            For24();
-            While10();
+            X = x;
+            Y = y;
         }
-        static void Integer26()
+    }
+
+    class Program
+    {
+        static void Main()
         {
-            int dayOfYear = int.Parse(Console.ReadLine());
-
-            int dayOfWeek = GetDayOfWeek(dayOfYear);
-        }
-        static int GetDayOfWeek(int dayOfYear)
-        {
-            int firstDayOfWeek = 2;
-            int dayOfWeek = (firstDayOfWeek + (dayOfYear - 1)) % 7;
-
-            if (dayOfWeek == 0)
-            {
-                dayOfWeek = 7;
-            }
-
-            return dayOfWeek;
-        }
-        static void Boolean38()
-        {
-            int x1 = int.Parse(Console.ReadLine());
-            int y1 = int.Parse(Console.ReadLine());
-
-            int x2 = int.Parse(Console.ReadLine());
-            int y2 = int.Parse(Console.ReadLine());
-
-            bool canBishopMove = CanBishopMove(x1, x2, y1, y2);
-
-            if (canBishopMove)
-            {
-                Console.WriteLine("Слон може ходити");
-            }
-            else
-            {
-                Console.WriteLine("Слон не може ходити");
-            }
-        }
-        static bool CanBishopMove(int x1, int y1, int x2, int y2)
-        {
-            return Math.Abs(x2 - x1) == Math.Abs(y2 - y1);
-        }
-        static void If13()
-        {
-            double a = double.Parse(Console.ReadLine());
-            double b = double.Parse(Console.ReadLine());
-            double c = double.Parse(Console.ReadLine());
-
-            double middleNumber = FindMiddleNumber(a, b, c);
-        }
-        static double FindMiddleNumber(double a, double b, double c)
-        {
-            double min = Math.Min(Math.Min(a, b), c);
-            double max = Math.Max(Math.Max(a, b), c);
-
-            double middleNumber = (a + b + c) - (min + max);
-
-            return middleNumber;
-        }
-        static void For12()
-        {
+            Console.WriteLine("Введіть кількість точок N:");
             int N = int.Parse(Console.ReadLine());
 
-            if (N > 0)
-            {
-                double product = CalculateProduct(N);
-            }
-        }
-        static double CalculateProduct(int N)
-        {
-            double product = 1.0;
+            List<Point> points = new List<Point>();
 
             for (int i = 1; i <= N; i++)
             {
-                double multiplier = 1.0 + (0.1 * i);
-                product *= multiplier;
+                Console.WriteLine($"Введіть координати точки {i} (x y):");
+                string[] input = Console.ReadLine().Split(' ');
+                double x = double.Parse(input[0]);
+                double y = double.Parse(input[1]);
+                points.Add(new Point(x, y));
             }
 
-            return product;
-        }
-        static void For24()
-        {
-            double X = double.Parse(Console.ReadLine());
+            double maxPerimeter = 0;
+            List<Point> maxPerimeterVertices = new List<Point>();
 
-            int N = int.Parse(Console.ReadLine());
-
-            double result = CalculateCosineApproximation(X, N);
-        }
-        static double CalculateCosineApproximation(double X, int N)
-        {
-            double cosApproximation = 0.0;
-            for (int i = 0; i <= N; i++)
+            // Перебираємо всі можливі комбінації трьох точок
+            for (int i = 0; i < N - 2; i++)
             {
-                double term = Math.Pow(-1, i) * Math.Pow(X, 2 * i) / Factorial(2 * i);
-                cosApproximation += term;
-            }
-            return cosApproximation;
-        }
-        static double Factorial(int n)
-        {
-            if (n == 0)
-            {
-                return 1.0;
-            }
-            double result = 1.0;
-            for (int i = 1; i <= n; i++)
-            {
-                result *= i;
-            }
-            return result;
-        }
-        static void While10()
-        {
-            int N = int.Parse(Console.ReadLine());
+                for (int j = i + 1; j < N - 1; j++)
+                {
+                    for (int k = j + 1; k < N; k++)
+                    {
+                        double side1 = Distance(points[i], points[j]);
+                        double side2 = Distance(points[j], points[k]);
+                        double side3 = Distance(points[k], points[i]);
+                        double perimeter = side1 + side2 + side3;
 
-            if (N > 1)
+                        if (perimeter > maxPerimeter)
+                        {
+                            maxPerimeter = perimeter;
+                            maxPerimeterVertices = new List<Point> { points[i], points[j], points[k] };
+                        }
+                    }
+                }
+            }
+
+            Console.WriteLine($"Найбільший периметр: {maxPerimeter}");
+            Console.WriteLine("Вершини треугольника:");
+            foreach (var vertex in maxPerimeterVertices)
             {
-                int K = FindLargestK(N);
+                Console.WriteLine($"({vertex.X}, {vertex.Y})");
             }
         }
 
-        static int FindLargestK(int N)
+        static double Distance(Point p1, Point p2)
         {
-            return N / 3;
+            double dx = p1.X - p2.X;
+            double dy = p1.Y - p2.Y;
+            return Math.Sqrt(dx * dx + dy * dy);
         }
     }
 }
